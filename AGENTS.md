@@ -28,6 +28,10 @@ Static single-page game. Vite + React 19 + TypeScript. No backend, no database, 
 
 Conventional Commits. `type(scope): summary`, imperative, under 50 chars. Scopes: `cards`, `game`, `net`, `ui`. Body only when the why isn't obvious. PR title same format. Fill `.github/PULL_REQUEST_TEMPLATE.md`.
 
+## Deploy
+
+Vercel, hobby team, linked to the GitHub repo. Push to `main` = production. PRs = preview URLs. No env vars. Never add anything that needs a paid plan.
+
 ## Commands
 
 ```sh
