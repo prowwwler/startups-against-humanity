@@ -26,7 +26,7 @@ Static single-page game. Vite + React 19 + TypeScript. No backend, no database, 
 
 ## Commits and PRs
 
-Conventional Commits. `type(scope): summary`, imperative, under 50 chars. Scopes: `cards`, `game`, `net`, `ui`. Body only when the why isn't obvious. PR title same format. Fill `.github/PULL_REQUEST_TEMPLATE.md`.
+Conventional Commits. `type(scope): summary`, imperative, under 50 chars. No Co-Authored-By or AI trailers. Scopes: `cards`, `game`, `net`, `ui`. Body only when the why isn't obvious. PR title same format. Fill `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ## Deploy
 
