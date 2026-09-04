@@ -50,7 +50,7 @@ npm run build    # static output in dist/
 
 | File | What |
 |---|---|
-| `src/cards.json` | The deck. `what` (black), `whom` (white), `strong` (bot judge bias). |
+| `src/cards.json` | The deck. `what` (black), `whom` (white), `strong` (bot judge bias), `gloss` (meanings for slang cards). |
 | `src/game.ts` | Pure reducer. All rules. `reduce(state, action)`, `botActions(state)`, `viewFor(state, viewerId)`, `pitch(what, whom)`. |
 | `src/game.test.ts` | Engine tests. Change a rule, add a failing test here first. |
 | `src/net.ts` | PeerJS host and join wrappers. |
@@ -66,6 +66,7 @@ Edit [`src/cards.json`](src/cards.json). Three lists:
 - `what`: black cards. A plain noun (`Open finance`) gets ` for ______` appended at render. A string containing `___` is a template and the blank is filled in place (`We got acquired by ___.`). One blank per card.
 - `whom`: white cards. Lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
 - `strong`: subset of `whom` the bot judge slightly prefers. Optional.
+- `gloss`: card text → one-line meaning, shown dimmed under the card. For SF slang and inside references outsiders won't get. Optional.
 
 No code needed to propose cards: [open an issue with the Pitch cards template](https://github.com/guilopeszw/startups-against-humanity/issues/new?template=new-cards.md).
 

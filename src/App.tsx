@@ -84,7 +84,7 @@ function Deal() {
   return (
     <div className="deal" aria-live="off">
       <div className="deal-cards" key={pair.what + pair.whom}>
-        <Card black big text={blank(pair.what)} />
+        <Card black big text={blank(pair.what)} term={pair.what} />
         <Card white big text={pair.whom} />
       </div>
       <p className="deal-line"><Typed key={line} text={line} /><span className="caret" aria-hidden /></p>
@@ -206,7 +206,7 @@ function Table({ state: s, me, dispatch, leave, lobby, status }: {
 
       {s.phase !== 'lobby' && (
         <div className="pitch">
-          <Card black big text={blank(s.what)} />
+          <Card black big text={blank(s.what)} term={s.what} />
           {s.phase === 'submit' && mine && <Card white big text={mine} pickable={false} />}
         </div>
       )}
@@ -276,7 +276,7 @@ function Winner({ state: s, me, dispatch }: { state: State; me: string; dispatch
       <div className="overlay-body">
         <p className="status">{over ? `${top(s).name} built the worst startup.` : `${winner.name} wins the round.`}</p>
         <div className="deal-cards">
-          <Card black big text={blank(s.what)} />
+          <Card black big text={blank(s.what)} term={s.what} />
           <Card white big text={s.submissions[s.winner!]} />
         </div>
         <p className="quote">“{pitch(s.what, s.submissions[s.winner!])}”</p>
@@ -310,14 +310,18 @@ function top(s: State) {
   return s.players.reduce((a, b) => (b.score > a.score ? b : a))
 }
 
-function Card({ text, black, white, big, pickable, winner, onClick }: {
-  text: string; black?: boolean; white?: boolean; big?: boolean; pickable?: boolean; winner?: boolean; onClick?: () => void
+function Card({ text, term, black, white, big, pickable, winner, onClick }: {
+  text: string; term?: string; black?: boolean; white?: boolean; big?: boolean; pickable?: boolean; winner?: boolean; onClick?: () => void
 }) {
   const cls = ['card', black && 'black', white && 'white', big && 'big', pickable && 'pickable', winner && 'winner'].filter(Boolean).join(' ')
+  const gloss = (cards.gloss as Record<string, string>)[term ?? text]
   return (
     <div className={cls} onClick={pickable ? onClick : undefined} role={pickable ? 'button' : undefined} tabIndex={pickable ? 0 : undefined}
       onKeyDown={pickable ? e => { if (e.key === 'Enter' || e.key === ' ') onClick?.() } : undefined}>
-      <div>{text}</div>
+      <div>
+        <div>{text}</div>
+        {gloss && <div className="gloss">{gloss}</div>}
+      </div>
       <div className="brand">Startups Against Humanity</div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { test } from 'node:test'
+import cards from './cards.json' with { type: 'json' }
 import assert from 'node:assert/strict'
 import { initial, reduce, botActions, viewFor, pitch, HAND_SIZE, submitters, type State } from './game.ts'
 
@@ -100,4 +101,14 @@ test('next: czar advances, host advances when czar is a bot, nobody else', () =>
   assert.equal(reduce(s, { type: 'next', id: 'host' }), s)
   s = reduce(s, { type: 'next', id: 'c' })
   assert.equal(s.round, 4)
+})
+
+test('deck: gloss keys are real cards, strong cards exist, no dupes', () => {
+  const dup = (a: string[]) => a.filter((x, i) => a.indexOf(x) !== i)
+  assert.deepEqual(dup(cards.what), [])
+  assert.deepEqual(dup(cards.whom), [])
+  assert.deepEqual(cards.strong.filter(s => !cards.whom.includes(s)), [])
+  const all = new Set([...cards.what, ...cards.whom])
+  assert.deepEqual(Object.keys(cards.gloss).filter(k => !all.has(k)), [])
+  assert.ok(Object.keys(cards.gloss).length > 50)
 })
