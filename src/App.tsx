@@ -31,7 +31,7 @@ function Home({ name, setName, go }: { name: string; setName: (n: string) => voi
     <div className="app home">
       <header className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <h1 className="hero-title"><span>Startups</span><span>Against</span><span>Humanity</span></h1>
-        <a className="ghost-link" href="https://github.com/guilopeszw/startups-against-humanity">GitHub</a>
+        <a className="ghost-link" href="https://github.com/prowwwler/startups-against-humanity">GitHub</a>
       </header>
 
       <section className="hero">
@@ -50,7 +50,7 @@ function Home({ name, setName, go }: { name: string; setName: (n: string) => voi
 
       <footer className="muted">
         {cards.what.length} black cards, {cards.whom.length} white. Three to ten players. Free, open source, no accounts.{' '}
-        <a className="ghost-link" href="https://github.com/guilopeszw/startups-against-humanity/issues/new?template=new-cards.md">Pitch a card.</a>
+        <a className="ghost-link" href="https://github.com/prowwwler/startups-against-humanity/issues/new?template=new-cards.md">Pitch a card.</a>
       </footer>
     </div>
   )

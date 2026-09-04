@@ -68,7 +68,7 @@ Edit [`src/cards.json`](src/cards.json). Three lists:
 - `strong`: subset of `whom` the bot judge slightly prefers. Optional.
 - `gloss`: card text → one-line meaning, shown dimmed under the card. For SF slang and inside references outsiders won't get. Optional.
 
-No code needed to propose cards: [open an issue with the Pitch cards template](https://github.com/guilopeszw/startups-against-humanity/issues/new?template=new-cards.md).
+No code needed to propose cards: [open an issue with the Pitch cards template](https://github.com/prowwwler/startups-against-humanity/issues/new?template=new-cards.md).
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for the tone rules before opening a PR. Cards that break them get closed without discussion.
 
