@@ -82,7 +82,36 @@ footer.muted { font-size: 14px; }
 
 
 @media (prefers-reduced-motion: reduce) {
-  .deal-cards .card, .caret { animation: none; }
+  .deal-cards .card, .caret, .overlay, .confetti span { animation: none; }
+}
+
+/* Winner overlay */
+.overlay {
+  position: fixed; inset: 0; z-index: 10;
+  background: rgba(0,0,0,.82);
+  display: grid; place-items: center;
+  padding: 24px;
+  animation: fade-in .25s ease both;
+  overflow: hidden;
+}
+.overlay-body { display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; position: relative; z-index: 1; }
+.overlay-body .status { margin: 0; font-size: 26px; }
+.overlay-body .quote { margin: 0; max-width: 34ch; }
+.overlay-body .deal-cards { padding: 12px 20px 16px 8px; }
+.overlay-body .deal-cards .card:first-child { animation: deal-in .45s cubic-bezier(.2,.8,.2,1) both; }
+.overlay-body .deal-cards .card:last-child { animation: deal-in .45s .1s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes fade-in { from { opacity: 0; } }
+
+.confetti { position: absolute; inset: 0; pointer-events: none; }
+.confetti span {
+  position: absolute; top: -20px;
+  border-radius: 2px;
+  animation: confetti-fall linear both;
+  opacity: 0;
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(var(--spin)); opacity: .8; }
 }
 
 /* Cards */

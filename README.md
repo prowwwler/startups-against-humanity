@@ -14,7 +14,8 @@ Static site, no backend, no accounts, no money. Runs on any static host for free
 1. Each round one player is the **Czar**. The Czar flips a black card: `Open finance for ______` or a template like `Our TAM slide is just a photo of ______.`
 2. Everyone else plays one white card from their hand of 7: `the homeless`, `Trudy the corgi`, `people asleep on BART`.
 3. The Czar reads every pitch out loud and picks the worst one. That player scores a point.
-4. Czar rotates. First to 5 wins. Minimum 3 players, bots count.
+4. The winning pitch goes up on screen. The Czar starts the next round. If the Czar is a bot, the host does, so in solo it is always you.
+5. Czar rotates. First to 5 wins. Minimum 3 players, bots count.
 
 ### Solo
 

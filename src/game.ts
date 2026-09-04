@@ -29,7 +29,7 @@ export type Action =
   | { type: 'start'; target?: number }
   | { type: 'submit'; id: string; card: string }
   | { type: 'pick'; id: string; card: string }
-  | { type: 'next' }
+  | { type: 'next'; id: string }
 
 export function shuffle<T>(a: T[], rand = Math.random): T[] {
   const b = a.slice()
@@ -78,6 +78,12 @@ function startRound(s: State): State {
 
 export function submitters(s: State): Player[] {
   return s.players.filter((_, i) => i !== s.czar)
+}
+
+/** Czar advances the round. If the Czar is a bot, the host (first player) does. Solo = host. */
+export function canNext(s: State, id: string): boolean {
+  const czar = s.players[s.czar]
+  return !!czar && (czar.id === id || (czar.bot && s.players[0]?.id === id))
 }
 
 export function reduce(prev: State, a: Action): State {
@@ -135,7 +141,7 @@ export function reduce(prev: State, a: Action): State {
       return s
     }
     case 'next': {
-      if (s.phase !== 'reveal') return prev
+      if (s.phase !== 'reveal' || !canNext(s, a.id)) return prev
       s.czar = (s.czar + 1) % s.players.length
       s.winner = undefined
       return startRound(s)

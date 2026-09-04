@@ -23,7 +23,7 @@ test('full solo game with bots ends at target', () => {
     } else if (s.phase === 'judge' && s.players[s.czar].id === 'me') {
       s = reduce(s, { type: 'pick', id: 'me', card: s.submissions[s.order[0]] })
     } else if (s.phase === 'reveal') {
-      s = reduce(s, { type: 'next' })
+      s = reduce(s, { type: 'next', id: 'me' })
     }
   }
   assert.equal(s.phase, 'over')
@@ -70,4 +70,34 @@ test('pitch fills blank or appends "for"', () => {
 test('names up to 24 chars survive join', () => {
   const s = reduce(initial(), { type: 'join', id: 'a', name: 'Guy Who Read Zero to One' })
   assert.equal(s.players[0].name, 'Guy Who Read Zero to One')
+})
+
+test('next: czar advances, host advances when czar is a bot, nobody else', () => {
+  let s = initial()
+  s = reduce(s, { type: 'join', id: 'host', name: 'host' })
+  s = reduce(s, { type: 'join', id: 'bot', name: 'bot', bot: true })
+  s = reduce(s, { type: 'join', id: 'c', name: 'c' })
+  s = reduce(s, { type: 'start', target: 10 })
+  const toReveal = (st: State) => {
+    for (const p of submitters(st)) st = reduce(st, { type: 'submit', id: p.id, card: st.hands[p.id][0] })
+    return reduce(st, { type: 'pick', id: st.players[st.czar].id, card: st.submissions[st.order[0]] })
+  }
+  // round 1: czar = host (human)
+  s = toReveal(s)
+  assert.equal(s.phase, 'reveal')
+  assert.equal(reduce(s, { type: 'next', id: 'c' }), s)
+  s = reduce(s, { type: 'next', id: 'host' })
+  assert.equal(s.round, 2)
+  // round 2: czar = bot → host may advance, c may not
+  assert.equal(s.players[s.czar].id, 'bot')
+  s = toReveal(s)
+  assert.equal(reduce(s, { type: 'next', id: 'c' }), s)
+  s = reduce(s, { type: 'next', id: 'host' })
+  assert.equal(s.round, 3)
+  // round 3: czar = c (human, not host) → only c
+  assert.equal(s.players[s.czar].id, 'c')
+  s = toReveal(s)
+  assert.equal(reduce(s, { type: 'next', id: 'host' }), s)
+  s = reduce(s, { type: 'next', id: 'c' })
+  assert.equal(s.round, 4)
 })

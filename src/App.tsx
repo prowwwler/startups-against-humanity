@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { initial, reduce, botActions, viewFor, submitters, blank, pitch, type Action, type State } from './game.ts'
+import { initial, reduce, botActions, viewFor, submitters, canNext, blank, pitch, type Action, type State } from './game.ts'
 import { hostRoom, joinRoom, makeCode, type Host, type Client } from './net.ts'
 import cards from './cards.json' with { type: 'json' }
 
@@ -119,11 +119,8 @@ function HostGame({ name, online, code, leave }: { name: string; online: boolean
   // Bot ticks.
   useEffect(() => {
     const acts = botActions(state)
-    if (!acts.length && !(state.phase === 'reveal' && state.players[state.czar]?.bot)) return
-    const t = setTimeout(() => {
-      if (acts.length) dispatch(acts[Math.floor(Math.random() * acts.length)])
-      else dispatch({ type: 'next' })
-    }, state.phase === 'reveal' ? 3500 : 900 + Math.random() * 1200)
+    if (!acts.length) return
+    const t = setTimeout(() => dispatch(acts[Math.floor(Math.random() * acts.length)]), 900 + Math.random() * 1200)
     return () => clearTimeout(t)
   }, [state])
 
@@ -248,14 +245,11 @@ function Table({ state: s, me, dispatch, leave, lobby, status }: {
               />
             ))}
           </div>
-          {s.phase === 'reveal' && !czar?.bot && <div className="section"><button className="primary" onClick={() => dispatch({ type: 'next' })}>Next round</button></div>}
-          {s.phase === 'over' && (
-            <div className="section stack">
-              <div className="status">🏆 {top(s)?.name} built the worst startup.</div>
-              {me === 'host' && <button className="primary" onClick={() => dispatch({ type: 'start' })}>Play again</button>}
-            </div>
-          )}
         </>
+      )}
+
+      {(s.phase === 'reveal' || s.phase === 'over') && s.winner && (
+        <Winner state={s} me={me} dispatch={dispatch} />
       )}
 
       <ul className="score">
@@ -266,6 +260,48 @@ function Table({ state: s, me, dispatch, leave, lobby, status }: {
         ))}
       </ul>
       {s.phase !== 'lobby' && <p className="muted">First to {s.target}. Round {s.round}.</p>}
+    </div>
+  )
+}
+
+function Winner({ state: s, me, dispatch }: { state: State; me: string; dispatch: (a: Action) => void }) {
+  const czar = s.players[s.czar]
+  const winner = s.players.find(p => p.id === s.winner)!
+  const over = s.phase === 'over'
+  const mayNext = over ? me === s.players[0]?.id : canNext(s, me)
+  const waitingOn = over ? s.players[0]?.name : czar?.bot ? s.players[0]?.name : czar?.name
+  return (
+    <div className="overlay" role="dialog" aria-modal="true" aria-label={over ? 'Game over' : 'Round winner'}>
+      <Confetti key={s.round} />
+      <div className="overlay-body">
+        <p className="status">{over ? `${top(s).name} built the worst startup.` : `${winner.name} wins the round.`}</p>
+        <div className="deal-cards">
+          <Card black big text={blank(s.what)} />
+          <Card white big text={s.submissions[s.winner!]} />
+        </div>
+        <p className="quote">“{pitch(s.what, s.submissions[s.winner!])}”</p>
+        {mayNext
+          ? <button className="primary" autoFocus onClick={() => dispatch(over ? { type: 'start' } : { type: 'next', id: me })}>{over ? 'Play again' : 'Next round'}</button>
+          : <p className="muted">Waiting for {waitingOn}…</p>}
+      </div>
+    </div>
+  )
+}
+
+function Confetti() {
+  const [bits] = useState(() => reduceMotion() ? [] : Array.from({ length: 48 }, (_, i) => ({
+    left: `${(i * 37) % 100}%`,
+    delay: `${(i % 12) * 0.12}s`,
+    dur: `${2.2 + (i % 5) * 0.35}s`,
+    size: `${6 + (i % 4) * 3}px`,
+    shade: ['#fff', '#ddd', '#999', '#666'][i % 4],
+    spin: `${(i % 2 ? 1 : -1) * (360 + (i % 3) * 180)}deg`,
+  })))
+  return (
+    <div className="confetti" aria-hidden>
+      {bits.map((b, i) => (
+        <span key={i} style={{ left: b.left, animationDelay: b.delay, animationDuration: b.dur, width: b.size, height: `${parseInt(b.size) * 1.6}px`, background: b.shade, ['--spin' as string]: b.spin }} />
+      ))}
     </div>
   )
 }
