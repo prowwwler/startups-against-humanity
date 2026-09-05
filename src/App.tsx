@@ -99,9 +99,21 @@ function Deal() {
   )
 }
 
+/** Add one bot with a name not already at the table. */
+function withBot(s: State): State {
+  const used = new Set(s.players.map(p => p.name))
+  const free = BOT_NAMES.filter(b => !used.has(b))
+  const n = free[Math.floor(Math.random() * free.length)] ?? `Bot ${s.players.length}`
+  return reduce(s, { type: 'join', id: `bot-${s.players.length}-${Date.now()}`, name: n, bot: true })
+}
+
 function HostGame({ name, online, code, leave }: { name: string; online: boolean; code: string; leave: () => void }) {
   const me = 'host'
-  const [state, setState] = useState<State>(() => reduce(initial(), { type: 'join', id: me, name }))
+  const [state, setState] = useState<State>(() => {
+    const joined = reduce(initial(), { type: 'join', id: me, name })
+    // Solo: skip the lobby, deal in two bots and start.
+    return online ? joined : reduce(withBot(withBot(joined)), { type: 'start' })
+  })
   const [status, setStatus] = useState(online ? 'connecting…' : '')
   const host = useRef<Host>(null)
 
@@ -131,12 +143,7 @@ function HostGame({ name, online, code, leave }: { name: string; online: boolean
     return () => clearTimeout(t)
   }, [state])
 
-  const addBot = () => {
-    const used = new Set(state.players.map(p => p.name))
-    const free = BOT_NAMES.filter(b => !used.has(b))
-    const n = free[Math.floor(Math.random() * free.length)] ?? `Bot ${state.players.length}`
-    dispatch({ type: 'join', id: `bot-${state.players.length}-${Date.now()}`, name: n, bot: true })
-  }
+  const addBot = () => setState(withBot)
 
   return (
     <Table
