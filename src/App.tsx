@@ -2,17 +2,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { initial, reduce, botActions, viewFor, submitters, canNext, blank, pitch, type Action, type State } from './game.ts'
 import { hostRoom, joinRoom, makeCode, type Host, type Client } from './net.ts'
 import cards from './cards.json' with { type: 'json' }
+import BOT_NAMES from './data/bots.json' with { type: 'json' }
 
 type Mode = { kind: 'home' } | { kind: 'host'; online: boolean; code: string } | { kind: 'join'; code: string }
-
-const BOT_NAMES = [
-  'Marc Andreessen', 'a16z Intern', 'Sam Altbot', 'ChatGPT Wrapper', 'YC Reject', 'Web3 Guy',
-  'Adam Neumann', 'Elizabeth Holmes', 'SBF', 'Do Kwon', "Your Cofounder's Cousin", 'Series A Guy',
-  'LinkedIn Lunatic', 'Angel Investor (Dentist)', 'Growth Hacker', 'Product Mommy', 'Cracked 19-Year-Old',
-  'Chief Vibes Officer', 'Intern With Equity', 'Deloitte Consultant', 'Bored Ape #4471', "Peter Thiel's Hot Tub",
-  'Meat Proxy', 'Clanker', 'Karl the Fog', 'Stealth Founder', 'Ex-Google (3 Months)', 'Fractional CTO',
-  'Techno-Optimist', 'Non-Technical Cofounder', 'Guy Who Read Zero to One', 'Dropout (Stanford)',
-]
 
 export default function App() {
   const [mode, setMode] = useState<Mode>({ kind: 'home' })
