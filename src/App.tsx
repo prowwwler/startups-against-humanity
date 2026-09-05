@@ -203,7 +203,7 @@ function Table({ state: s, me, dispatch, leave, lobby, status }: {
   return (
     <div className="app">
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <h1 className="title" style={{ fontSize: 24 }}>Startups Against Humanity</h1>
+        <h1 className="title" style={{ fontSize: 24, opacity: .5 }}>Startups Against Humanity</h1>
         <button onClick={leave}>Leave</button>
       </div>
       {status && <p className={status.startsWith('Error') ? 'err' : 'muted'}>{status}</p>}
