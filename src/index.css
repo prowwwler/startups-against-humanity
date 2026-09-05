@@ -60,7 +60,7 @@ input.code { text-transform: uppercase; letter-spacing: .3em; text-align: center
 .ghost-link { color: var(--muted); text-decoration: none; font-weight: 400; padding-top: 6px; }
 .ghost-link:hover { color: var(--fg); }
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
-.lede { font-size: 20px; margin: 0 0 8px; max-width: 32ch; }
+.lede { font-size: 20px; margin: 0; max-width: 32ch; }
 .menu input:not(.code) { font-size: 18px; }
 .menu > button { font-size: 18px; padding: 14px 36px; }
 .menu { align-self: stretch; max-width: 320px; }
