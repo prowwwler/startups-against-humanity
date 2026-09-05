@@ -1,4 +1,4 @@
-import cards from './cards.json' with { type: 'json' }
+import cards from './data/cards.json' with { type: 'json' }
 
 export const HAND_SIZE = 5
 export const DEFAULT_TARGET = 5

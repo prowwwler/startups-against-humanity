@@ -50,7 +50,7 @@ npm run build    # static output in dist/
 
 | File | What |
 |---|---|
-| `src/cards.json` | The deck. `what` (black), `whom` (white), `strong` (bot judge bias), `gloss` (meanings for slang cards). |
+| `src/data/cards.json` | The deck. `what` (black), `whom` (white), `strong` (bot judge bias), `gloss` (meanings for slang cards). |
 | `src/game.ts` | Pure reducer. All rules. `reduce(state, action)`, `botActions(state)`, `viewFor(state, viewerId)`, `pitch(what, whom)`. |
 | `src/game.test.ts` | Engine tests. Change a rule, add a failing test here first. |
 | `src/net.ts` | PeerJS host and join wrappers. |
@@ -61,7 +61,7 @@ Solo and Host are the same code path. Solo is Host with networking off and bots 
 
 ## Add cards
 
-Edit [`src/cards.json`](src/cards.json). Three lists:
+Edit [`src/data/cards.json`](src/data/cards.json). Three lists:
 
 - `what`: black cards. A plain noun (`Open finance`) gets ` for ______` appended at render. A string containing `___` is a template and the blank is filled in place (`We got acquired by ___.`). One blank per card.
 - `whom`: white cards. Lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.

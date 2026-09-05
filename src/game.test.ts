@@ -1,5 +1,5 @@
 import { test } from 'node:test'
-import cards from './cards.json' with { type: 'json' }
+import cards from './data/cards.json' with { type: 'json' }
 import assert from 'node:assert/strict'
 import { initial, reduce, botActions, viewFor, pitch, HAND_SIZE, submitters, type State } from './game.ts'
 

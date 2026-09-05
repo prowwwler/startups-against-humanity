@@ -32,7 +32,7 @@ SF tech culture, current. [sf-isms.org](https://sfisms.org) for the dialect, the
 
 - `what`: title case, no trailing punctuation. Must read as `[WHAT] for [WHOM]`. `Uber, but` style is fine.
 - `whom`: lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
-- No duplicates. Check `node -e 'const c=require("./src/cards.json");console.log(new Set(c.whom).size===c.whom.length)'`.
+- No duplicates. Check `node -e 'const c=require("./src/data/cards.json");console.log(new Set(c.whom).size===c.whom.length)'`.
 - `strong` entries must exist in `whom`.
 - `gloss`: if the card is slang or an inside reference, add a one-line meaning keyed by the exact card text. Deadpan, under 15 words. Skip it for cards that need no explanation.
 

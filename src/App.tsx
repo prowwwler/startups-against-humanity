@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { initial, reduce, botActions, viewFor, submitters, canNext, blank, pitch, type Action, type State } from './game.ts'
 import { hostRoom, joinRoom, makeCode, type Host, type Client } from './net.ts'
-import cards from './cards.json' with { type: 'json' }
+import cards from './data/cards.json' with { type: 'json' }
 import BOT_NAMES from './data/bots.json' with { type: 'json' }
 import FUNDING from './data/funding-values.json' with { type: 'json' }
 
