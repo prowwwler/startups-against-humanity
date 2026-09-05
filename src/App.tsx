@@ -3,6 +3,7 @@ import { initial, reduce, botActions, viewFor, submitters, canNext, blank, pitch
 import { hostRoom, joinRoom, makeCode, type Host, type Client } from './net.ts'
 import cards from './cards.json' with { type: 'json' }
 import BOT_NAMES from './data/bots.json' with { type: 'json' }
+import FUNDING from './data/funding-values.json' with { type: 'json' }
 
 type Mode = { kind: 'home' } | { kind: 'host'; online: boolean; code: string } | { kind: 'join'; code: string }
 
@@ -270,6 +271,12 @@ function Table({ state: s, me, dispatch, leave, lobby, status }: {
   )
 }
 
+/** Stable per round so it survives re-renders without living in game state. */
+function funding(s: State): string {
+  const seed = [...(s.winner ?? ''), ...String(s.round)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 1e9, 7)
+  return FUNDING[seed % FUNDING.length]
+}
+
 function Winner({ state: s, me, dispatch }: { state: State; me: string; dispatch: (a: Action) => void }) {
   const czar = s.players[s.czar]
   const winner = s.players.find(p => p.id === s.winner)!
@@ -286,6 +293,7 @@ function Winner({ state: s, me, dispatch }: { state: State; me: string; dispatch
           <Card white big text={s.submissions[s.winner!]} />
         </div>
         <p className="quote">“{pitch(s.what, s.submissions[s.winner!])}”</p>
+        <p className="muted">Raised {funding(s)} in funding.</p>
         {mayNext
           ? <button className="primary" autoFocus onClick={() => dispatch(over ? { type: 'start' } : { type: 'next', id: me })}>{over ? 'Play again' : 'Next round'}</button>
           : <p className="muted">Waiting for {waitingOn}…</p>}
