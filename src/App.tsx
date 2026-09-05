@@ -283,6 +283,8 @@ function Winner({ state: s, me, dispatch }: { state: State; me: string; dispatch
   const over = s.phase === 'over'
   const mayNext = over ? me === s.players[0]?.id : canNext(s, me)
   const waitingOn = over ? s.players[0]?.name : czar?.bot ? s.players[0]?.name : czar?.name
+  const line = pitch(s.what, s.submissions[s.winner!])
+  const raised = funding(s)
   return (
     <div className="overlay" role="dialog" aria-modal="true" aria-label={over ? 'Game over' : 'Round winner'}>
       <Confetti key={s.round} />
@@ -292,14 +294,47 @@ function Winner({ state: s, me, dispatch }: { state: State; me: string; dispatch
           <Card black big text={blank(s.what)} term={s.what} />
           <Card white big text={s.submissions[s.winner!]} />
         </div>
-        <p className="quote">“{pitch(s.what, s.submissions[s.winner!])}”</p>
-        <p className="muted">Raised {funding(s)} in funding.</p>
-        {mayNext
-          ? <button className="primary" autoFocus onClick={() => dispatch(over ? { type: 'start' } : { type: 'next', id: me })}>{over ? 'Play again' : 'Next round'}</button>
-          : <p className="muted">Waiting for {waitingOn}…</p>}
+        <p className="quote">“{line}”</p>
+        <p className="muted">Raised {raised}.</p>
+        <div className="row">
+          <Share text={shareText(line, raised)} />
+          {mayNext
+            ? <button className="primary" autoFocus onClick={() => dispatch(over ? { type: 'start' } : { type: 'next', id: me })}>{over ? 'Play again' : 'Next round'}</button>
+            : <p className="muted">Waiting for {waitingOn}…</p>}
+        </div>
       </div>
     </div>
   )
+}
+
+const SITE = 'https://startups-against-humanity.vercel.app/'
+
+function shareText(line: string, raised: string) {
+  return [
+    '💼 Revolutionary startup:',
+    '',
+    `“${line}”`,
+    '',
+    `Raised ${raised}. 💰`,
+    '',
+    'Pitch your own worst startup:',
+    SITE,
+  ].join('\n')
+}
+
+/** Native share sheet where it exists, clipboard everywhere else. */
+function Share({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    if (!copied) return
+    const t = setTimeout(() => setCopied(false), 1500)
+    return () => clearTimeout(t)
+  }, [copied])
+  const share = () => {
+    if (navigator.share) navigator.share({ text }).catch(() => {})
+    else navigator.clipboard.writeText(text).then(() => setCopied(true), () => {})
+  }
+  return <button onClick={share}>{copied ? 'Copied' : 'Share'}</button>
 }
 
 function Confetti() {

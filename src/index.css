@@ -104,7 +104,7 @@ footer.muted { font-size: 14px; }
 }
 .overlay-body { display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; position: relative; z-index: 1; }
 .overlay-body .status { margin: 0; font-size: 26px; }
-.overlay-body .quote { margin: 0; max-width: 34ch; }
+.overlay-body .quote { margin: 0 0 -8px; max-width: 34ch; }
 .overlay-body .deal-cards { padding: 12px 20px 16px 8px; }
 .overlay-body .deal-cards .card:first-child { animation: deal-in .45s cubic-bezier(.2,.8,.2,1) both; }
 .overlay-body .deal-cards .card:last-child { animation: deal-in .45s .1s cubic-bezier(.2,.8,.2,1) both; }
