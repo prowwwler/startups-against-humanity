@@ -1,6 +1,6 @@
 import cards from './cards.json' with { type: 'json' }
 
-export const HAND_SIZE = 7
+export const HAND_SIZE = 5
 export const DEFAULT_TARGET = 5
 
 export type Player = { id: string; name: string; bot: boolean; score: number }

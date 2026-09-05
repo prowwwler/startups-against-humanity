@@ -7,6 +7,16 @@ function seeded(seed = 1) {
   return () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
 }
 
+test('every player and bot holds five cards', () => {
+  let s: State = initial()
+  s = reduce(s, { type: 'join', id: 'me', name: 'me' })
+  s = reduce(s, { type: 'join', id: 'b1', name: 'b1', bot: true })
+  s = reduce(s, { type: 'join', id: 'b2', name: 'b2', bot: true })
+  s = reduce(s, { type: 'start' })
+  assert.equal(HAND_SIZE, 5)
+  for (const p of s.players) assert.equal(s.hands[p.id].length, 5)
+})
+
 test('full solo game with bots ends at target', () => {
   const rand = seeded()
   let s: State = initial()
