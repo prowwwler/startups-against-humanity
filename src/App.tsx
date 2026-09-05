@@ -26,6 +26,7 @@ export default function App() {
 
 function Home({ name, setName, go }: { name: string; setName: (n: string) => void; go: (m: Mode) => void }) {
   const [code, setCode] = useState('')
+  const [multi, setMulti] = useState(false)
   const ok = name.trim().length > 0
   return (
     <div className="app home">
@@ -39,12 +40,18 @@ function Home({ name, setName, go }: { name: string; setName: (n: string) => voi
         <div className="stack menu">
           <p className="lede">Draw two cards. Pitch the worst startup. Worst pitch wins.</p>
           <input placeholder="Your name" value={name} maxLength={24} onChange={e => setName(e.target.value)} aria-label="Your name" />
-          <button className="primary" disabled={!ok} onClick={() => go({ kind: 'host', online: false, code: 'solo' })}>Play vs bots</button>
-          <div className="row">
-            <button disabled={!ok} onClick={() => go({ kind: 'host', online: true, code: makeCode() })}>Host a game</button>
-            <input className="code" placeholder="CODE" maxLength={4} value={code} onChange={e => setCode(e.target.value.toUpperCase())} aria-label="Room code" />
-            <button disabled={!ok || code.length !== 4} onClick={() => go({ kind: 'join', code })}>Join</button>
-          </div>
+          <hr className="rule" />
+          <button className="primary" disabled={!ok} onClick={() => go({ kind: 'host', online: false, code: 'solo' })}>Play Alone</button>
+          <button disabled={!ok} aria-expanded={multi} onClick={() => setMulti(m => !m)}>Multiplayer</button>
+          {multi && (
+            <div className="stack submenu">
+              <button disabled={!ok} onClick={() => go({ kind: 'host', online: true, code: makeCode() })}>Host a game</button>
+              <div className="row">
+                <input className="code" placeholder="CODE" maxLength={4} value={code} onChange={e => setCode(e.target.value.toUpperCase())} aria-label="Room code" />
+                <button disabled={!ok || code.length !== 4} onClick={() => go({ kind: 'join', code })}>Join</button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
