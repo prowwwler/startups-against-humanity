@@ -50,7 +50,10 @@ npm run build    # static output in dist/
 
 | File | What |
 |---|---|
-| `src/data/cards.json` | The deck. `what` (black), `whom` (white), `strong` (bot judge bias), `gloss` (meanings for slang cards). |
+| `src/data/cards/what.json` | Black cards. |
+| `src/data/cards/whom.json` | White cards. |
+| `src/data/cards/strong.json` | Subset of `whom` the bot judge prefers. |
+| `src/data/cards/gloss.json` | Card text to a one-line meaning, for slang cards. |
 | `src/game.ts` | Pure reducer. All rules. `reduce(state, action)`, `botActions(state)`, `viewFor(state, viewerId)`, `pitch(what, whom)`. |
 | `src/game.test.ts` | Engine tests. Change a rule, add a failing test here first. |
 | `src/net.ts` | PeerJS host and join wrappers. |
@@ -61,12 +64,12 @@ Solo and Host are the same code path. Solo is Host with networking off and bots 
 
 ## Add cards
 
-Edit [`src/data/cards.json`](src/data/cards.json). Three lists:
+Edit the deck files in [`src/data/cards/`](src/data/cards). One list per file:
 
-- `what`: black cards. A plain noun (`Open finance`) gets ` for ______` appended at render. A string containing `___` is a template and the blank is filled in place (`We got acquired by ___.`). One blank per card.
-- `whom`: white cards. Lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
-- `strong`: subset of `whom` the bot judge slightly prefers. Optional.
-- `gloss`: card text → one-line meaning, shown dimmed under the card. For SF slang and inside references outsiders won't get. Optional.
+- [`what.json`](src/data/cards/what.json): black cards. A plain noun (`Open finance`) gets ` for ______` appended at render. A string containing `___` is a template and the blank is filled in place (`We got acquired by ___.`). One blank per card.
+- [`whom.json`](src/data/cards/whom.json): white cards. Lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
+- [`strong.json`](src/data/cards/strong.json): subset of `whom` the bot judge slightly prefers. Optional.
+- [`gloss.json`](src/data/cards/gloss.json): card text → one-line meaning, shown dimmed under the card. For SF slang and inside references outsiders won't get. Optional.
 
 No code needed to propose cards: [open an issue with the Pitch cards template](https://github.com/prowwwler/startups-against-humanity/issues/new?template=new-cards.md).
 

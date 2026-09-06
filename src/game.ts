@@ -1,4 +1,6 @@
-import cards from './data/cards.json' with { type: 'json' }
+import WHAT from './data/cards/what.json' with { type: 'json' }
+import WHOM from './data/cards/whom.json' with { type: 'json' }
+import STRONG from './data/cards/strong.json' with { type: 'json' }
 
 export const HAND_SIZE = 5
 export const DEFAULT_TARGET = 5
@@ -59,14 +61,14 @@ export function initial(): State {
 function draw(s: State, id: string) {
   const hand = s.hands[id] ?? []
   while (hand.length < HAND_SIZE) {
-    if (s.whomDeck.length === 0) s.whomDeck = shuffle(cards.whom)
+    if (s.whomDeck.length === 0) s.whomDeck = shuffle(WHOM)
     hand.push(s.whomDeck.pop()!)
   }
   s.hands[id] = hand
 }
 
 function startRound(s: State): State {
-  if (s.whatDeck.length === 0) s.whatDeck = shuffle(cards.what)
+  if (s.whatDeck.length === 0) s.whatDeck = shuffle(WHAT)
   s.what = s.whatDeck.pop()!
   s.submissions = {}
   s.order = []
@@ -161,7 +163,7 @@ export function botActions(s: State, rand = Math.random): Action[] {
     }
   } else if (s.phase === 'judge' && s.players[s.czar]?.bot) {
     const subs = s.order.map(id => s.submissions[id])
-    const strong = subs.filter(c => (cards.strong as string[]).includes(c))
+    const strong = subs.filter(c => STRONG.includes(c))
     // ponytail: bot judge = random with 60% bias to hand-tagged strong cards. Upgrade: per-card scores if it feels dumb.
     const pool = strong.length && rand() < 0.6 ? strong : subs
     out.push({ type: 'pick', id: s.players[s.czar].id, card: pool[Math.floor(rand() * pool.length)] })

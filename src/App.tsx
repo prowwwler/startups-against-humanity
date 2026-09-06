@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { initial, reduce, botActions, viewFor, submitters, canNext, blank, pitch, type Action, type State } from './game.ts'
 import { hostRoom, joinRoom, makeCode, type Host, type Client } from './net.ts'
-import cards from './data/cards.json' with { type: 'json' }
+import WHAT from './data/cards/what.json' with { type: 'json' }
+import WHOM from './data/cards/whom.json' with { type: 'json' }
+import GLOSS from './data/cards/gloss.json' with { type: 'json' }
 import BOT_NAMES from './data/bots.json' with { type: 'json' }
 import FUNDING from './data/funding-values.json' with { type: 'json' }
 
@@ -49,7 +51,7 @@ function Home({ name, setName, go }: { name: string; setName: (n: string) => voi
       </section>
 
       <footer className="muted">
-        {cards.what.length} black cards, {cards.whom.length} white. Three to ten players. Free, open source, no accounts.{' '}
+        {WHAT.length} black cards, {WHOM.length} white. Three to ten players. Free, open source, no accounts.{' '}
         <a className="ghost-link" href="https://github.com/prowwwler/startups-against-humanity/issues/new?template=new-cards.md">Pitch a card.</a>
       </footer>
     </div>
@@ -58,8 +60,8 @@ function Home({ name, setName, go }: { name: string; setName: (n: string) => voi
 
 function randomPair(prev?: { what: string; whom: string }) {
   let what = prev?.what
-  while (what === prev?.what) what = cards.what[Math.floor(Math.random() * cards.what.length)]
-  return { what: what!, whom: cards.whom[Math.floor(Math.random() * cards.whom.length)] }
+  while (what === prev?.what) what = WHAT[Math.floor(Math.random() * WHAT.length)]
+  return { what: what!, whom: WHOM[Math.floor(Math.random() * WHOM.length)] }
 }
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -363,7 +365,7 @@ function Card({ text, term, black, white, big, pickable, winner, onClick }: {
   text: string; term?: string; black?: boolean; white?: boolean; big?: boolean; pickable?: boolean; winner?: boolean; onClick?: () => void
 }) {
   const cls = ['card', black && 'black', white && 'white', big && 'big', pickable && 'pickable', winner && 'winner'].filter(Boolean).join(' ')
-  const gloss = (cards.gloss as Record<string, string>)[term ?? text]
+  const gloss = (GLOSS as Record<string, string>)[term ?? text]
   return (
     <div className={cls} onClick={pickable ? onClick : undefined} role={pickable ? 'button' : undefined} tabIndex={pickable ? 0 : undefined}
       onKeyDown={pickable ? e => { if (e.key === 'Enter' || e.key === ' ') onClick?.() } : undefined}>
