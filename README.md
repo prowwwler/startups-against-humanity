@@ -40,7 +40,7 @@ Node 24.
 
 ```sh
 npm install
-npm run dev      # http://localhost:5173
+npm run dev      # http://localhost:6565
 npm test         # engine tests, node:test, no framework
 npm run lint     # oxlint
 npm run build    # static output in dist/
