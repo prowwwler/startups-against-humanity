@@ -1,21 +1,33 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { initial, reduce, botActions, viewFor, submitters, canNext, blank, pitch, type Action, type State } from './game.ts'
+import { initial, reduce, botActions, viewFor, submitters, canNext, blank, pitch, pool, SETS, ALL_SETS, DEFAULT_SETS, type Action, type State } from './game.ts'
 import { hostRoom, joinRoom, makeCode, type Host, type Client } from './net.ts'
-import WHAT from './data/cards/what.json' with { type: 'json' }
-import WHOM from './data/cards/whom.json' with { type: 'json' }
 import GLOSS from './data/cards/gloss.json' with { type: 'json' }
 import BOT_NAMES from './data/bots.json' with { type: 'json' }
 import FUNDING from './data/funding-values.json' with { type: 'json' }
 
-type Mode = { kind: 'home' } | { kind: 'host'; online: boolean; code: string } | { kind: 'join'; code: string }
+type Mode = { kind: 'home' } | { kind: 'deck' } | { kind: 'host'; online: boolean; code: string } | { kind: 'join'; code: string }
+
+function readSets(): string[] {
+  try {
+    const saved = JSON.parse(localStorage.getItem('sah-sets') ?? 'null')
+    if (Array.isArray(saved)) return saved.filter(id => ALL_SETS.includes(id))
+  } catch { /* corrupt entry, fall through */ }
+  return DEFAULT_SETS
+}
+
+const WHAT = pool('what', ALL_SETS)
+const WHOM = pool('whom', ALL_SETS)
 
 export default function App() {
   const [mode, setMode] = useState<Mode>({ kind: 'home' })
   const [name, setName] = useState(() => localStorage.getItem('sah-name') ?? '')
+  const [sets, setSets] = useState<string[]>(readSets)
   useEffect(() => localStorage.setItem('sah-name', name), [name])
+  useEffect(() => localStorage.setItem('sah-sets', JSON.stringify(sets)), [sets])
 
   if (mode.kind === 'home') return <Home name={name} setName={setName} go={setMode} />
-  if (mode.kind === 'host') return <HostGame key={mode.code} name={name} online={mode.online} code={mode.code} leave={() => setMode({ kind: 'home' })} />
+  if (mode.kind === 'deck') return <Deck sets={sets} setSets={setSets} back={() => setMode({ kind: 'home' })} />
+  if (mode.kind === 'host') return <HostGame key={mode.code} name={name} online={mode.online} code={mode.code} sets={sets} leave={() => setMode({ kind: 'home' })} />
   return <JoinGame key={mode.code} name={name} code={mode.code} leave={() => setMode({ kind: 'home' })} />
 }
 
@@ -47,6 +59,7 @@ function Home({ name, setName, go }: { name: string; setName: (n: string) => voi
               </div>
             </div>
           )}
+          <button className="link" onClick={() => go({ kind: 'deck' })}>Edit deck</button>
         </div>
       </section>
 
@@ -54,6 +67,35 @@ function Home({ name, setName, go }: { name: string; setName: (n: string) => voi
         {WHAT.length} black cards, {WHOM.length} white. Three to ten players. Free, open source, no accounts.{' '}
         <a className="ghost-link" href="https://github.com/prowwwler/startups-against-humanity/issues/new?template=new-cards.md">Pitch a card.</a>
       </footer>
+    </div>
+  )
+}
+
+function Deck({ sets, setSets, back }: { sets: string[]; setSets: (s: string[]) => void; back: () => void }) {
+  const toggle = (id: string) => setSets(sets.includes(id) ? sets.filter(x => x !== id) : [...sets, id])
+  const section = (title: string, kind: 'what' | 'whom') => (
+    <div className="section">
+      <h2 className="status">{title}</h2>
+      <div className="stack">
+        {SETS[kind].map(set => (
+          <label key={set.id} className="row set">
+            <input type="checkbox" checked={sets.includes(set.id)} onChange={() => toggle(set.id)} />
+            <span>{set.name}</span>
+            <span className="muted">{set.cards.length}</span>
+          </label>
+        ))}
+        {!SETS[kind].some(set => sets.includes(set.id)) && <p className="muted">None picked, so all of them are in.</p>}
+      </div>
+    </div>
+  )
+  return (
+    <div className="app">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <h1 className="title" style={{ fontSize: 24, opacity: .5 }}>Edit deck</h1>
+        <button onClick={back}>Done</button>
+      </div>
+      {section('Black cards', 'what')}
+      {section('White cards', 'whom')}
     </div>
   )
 }
@@ -104,7 +146,7 @@ function withBot(s: State): State {
   return reduce(s, { type: 'join', id: `bot-${s.players.length}-${Date.now()}`, name: n, bot: true })
 }
 
-function HostGame({ name, online, code, leave }: { name: string; online: boolean; code: string; leave: () => void }) {
+function HostGame({ name, online, code, sets, leave }: { name: string; online: boolean; code: string; sets: string[]; leave: () => void }) {
   const me = 'host'
   const [state, setState] = useState<State>(() => {
     const joined = reduce(initial(), { type: 'join', id: me, name })
@@ -112,7 +154,7 @@ function HostGame({ name, online, code, leave }: { name: string; online: boolean
     // Solo: skip the lobby, deal in four bots and start.
     let solo = joined
     for (let i = 0; i < SOLO_BOTS; i++) solo = withBot(solo)
-    return reduce(solo, { type: 'start' })
+    return reduce(solo, { type: 'start', sets })
   })
   const [status, setStatus] = useState(online ? 'connecting…' : '')
   const host = useRef<Host>(null)
@@ -156,7 +198,7 @@ function HostGame({ name, online, code, leave }: { name: string; online: boolean
           </>}
           <div className="row">
             <button onClick={addBot} disabled={state.players.length >= 10}>+ Add bot</button>
-            <button className="primary" disabled={state.players.length < 3} onClick={() => dispatch({ type: 'start' })}>
+            <button className="primary" disabled={state.players.length < 3} onClick={() => dispatch({ type: 'start', sets })}>
               Start {state.players.length < 3 && '(need 3)'}
             </button>
           </div>

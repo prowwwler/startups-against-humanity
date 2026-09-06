@@ -50,8 +50,8 @@ npm run build    # static output in dist/
 
 | File | What |
 |---|---|
-| `src/data/cards/what.json` | Black cards. |
-| `src/data/cards/whom.json` | White cards. |
+| `src/data/cards/what/` | Black cards, one file per subset. |
+| `src/data/cards/whom/` | White cards, one file per subset. |
 | `src/data/cards/strong.json` | Subset of `whom` the bot judge prefers. |
 | `src/data/cards/gloss.json` | Card text to a one-line meaning, for slang cards. |
 | `src/game.ts` | Pure reducer. All rules. `reduce(state, action)`, `botActions(state)`, `viewFor(state, viewerId)`, `pitch(what, whom)`. |
@@ -64,10 +64,10 @@ Solo and Host are the same code path. Solo is Host with networking off and bots 
 
 ## Add cards
 
-Edit the deck files in [`src/data/cards/`](src/data/cards). One list per file:
+Edit the deck files in [`src/data/cards/`](src/data/cards). Each file under `what/` and `whom/` is a subset players can switch off on the Edit deck screen; a new subset needs a file and a line in `SETS` in `src/game.ts`.
 
-- [`what.json`](src/data/cards/what.json): black cards. A plain noun (`Open finance`) gets ` for ______` appended at render. A string containing `___` is a template and the blank is filled in place (`We got acquired by ___.`). One blank per card.
-- [`whom.json`](src/data/cards/whom.json): white cards. Lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
+- [`what/`](src/data/cards/what): black cards. A plain noun (`Open finance`) gets ` for ______` appended at render. A string containing `___` is a template and the blank is filled in place (`We got acquired by ___.`). One blank per card.
+- [`whom/`](src/data/cards/whom): white cards. Lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
 - [`strong.json`](src/data/cards/strong.json): subset of `whom` the bot judge slightly prefers. Optional.
 - [`gloss.json`](src/data/cards/gloss.json): card text → one-line meaning, shown dimmed under the card. For SF slang and inside references outsiders won't get. Optional.
 

@@ -1,6 +1,34 @@
-import WHAT from './data/cards/what.json' with { type: 'json' }
-import WHOM from './data/cards/whom.json' with { type: 'json' }
+import whatStartup from './data/cards/what/startup.json' with { type: 'json' }
+import whatSf from './data/cards/what/sf.json' with { type: 'json' }
+import whomVictims from './data/cards/whom/victims.json' with { type: 'json' }
+import whomSf from './data/cards/whom/sf.json' with { type: 'json' }
 import STRONG from './data/cards/strong.json' with { type: 'json' }
+
+export type Kind = 'what' | 'whom'
+export type CardSet = { id: string; name: string; cards: string[] }
+
+/** Deck subsets a host can turn on and off. Add a file, add a line. */
+export const SETS: Record<Kind, CardSet[]> = {
+  what: [
+    { id: 'what:startup', name: 'Startup satire', cards: whatStartup },
+    { id: 'what:sf', name: 'SF glossary', cards: whatSf },
+  ],
+  whom: [
+    { id: 'whom:victims', name: 'Victims', cards: whomVictims },
+    { id: 'whom:sf', name: 'SF glossary', cards: whomSf },
+  ],
+}
+
+export const ALL_SETS = [...SETS.what, ...SETS.whom].map(s => s.id)
+
+/** SF glossary is off until a host asks for it. The jokes need local knowledge. */
+export const DEFAULT_SETS = ALL_SETS.filter(id => !id.endsWith(':sf'))
+
+/** Cards from the chosen subsets. Choosing none of a colour means all of it. */
+export function pool(kind: Kind, sets: string[]): string[] {
+  const on = SETS[kind].filter(s => sets.includes(s.id))
+  return (on.length ? on : SETS[kind]).flatMap(s => s.cards)
+}
 
 export const HAND_SIZE = 5
 export const DEFAULT_TARGET = 5
@@ -11,6 +39,8 @@ export type Phase = 'lobby' | 'submit' | 'judge' | 'reveal' | 'over'
 export type State = {
   phase: Phase
   target: number
+  /** Deck subsets in play, chosen by the host at start. */
+  sets: string[]
   players: Player[]
   czar: number
   what: string
@@ -28,7 +58,7 @@ export type State = {
 export type Action =
   | { type: 'join'; id: string; name: string; bot?: boolean }
   | { type: 'leave'; id: string }
-  | { type: 'start'; target?: number }
+  | { type: 'start'; target?: number; sets?: string[] }
   | { type: 'submit'; id: string; card: string }
   | { type: 'pick'; id: string; card: string }
   | { type: 'next'; id: string }
@@ -46,6 +76,7 @@ export function initial(): State {
   return {
     phase: 'lobby',
     target: DEFAULT_TARGET,
+    sets: DEFAULT_SETS,
     players: [],
     czar: 0,
     what: '',
@@ -61,14 +92,14 @@ export function initial(): State {
 function draw(s: State, id: string) {
   const hand = s.hands[id] ?? []
   while (hand.length < HAND_SIZE) {
-    if (s.whomDeck.length === 0) s.whomDeck = shuffle(WHOM)
+    if (s.whomDeck.length === 0) s.whomDeck = shuffle(pool('whom', s.sets))
     hand.push(s.whomDeck.pop()!)
   }
   s.hands[id] = hand
 }
 
 function startRound(s: State): State {
-  if (s.whatDeck.length === 0) s.whatDeck = shuffle(WHAT)
+  if (s.whatDeck.length === 0) s.whatDeck = shuffle(pool('what', s.sets))
   s.what = s.whatDeck.pop()!
   s.submissions = {}
   s.order = []
@@ -111,11 +142,14 @@ export function reduce(prev: State, a: Action): State {
     case 'start': {
       if (s.players.length < 3) return prev
       s.target = a.target ?? s.target
+      s.sets = a.sets ?? s.sets
       for (const p of s.players) p.score = 0
       s.czar = 0
       s.round = 0
       s.winner = undefined
       s.hands = {}
+      s.whatDeck = []
+      s.whomDeck = []
       return startRound(s)
     }
     case 'submit': {

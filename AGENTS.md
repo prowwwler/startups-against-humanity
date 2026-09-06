@@ -8,7 +8,7 @@ Static single-page game. Vite + React 19 + TypeScript. No backend, no database, 
 
 ## Layout
 
-- `src/data/cards/`: the deck, one list per file: `what.json` (black), `whom.json` (white), `strong.json` (bot judge bias), `gloss.json` (meanings for slang cards).
+- `src/data/cards/`: the deck. `what/` (black) and `whom/` (white) hold one file per switchable subset, listed in `SETS` in `game.ts`. `strong.json` is the bot judge bias, `gloss.json` the meanings for slang cards.
 - `src/data/`: other static content. `bots.json` names the bots, `funding-values.json` the winner payouts.
 - `src/game.ts` — pure reducer. All rules live here. `reduce(state, action)`, `botActions(state)`, `viewFor(state, viewerId)`.
 - `src/game.test.ts` — engine tests. `node:test`, no framework.

@@ -62,14 +62,20 @@ input.code { text-transform: uppercase; letter-spacing: .3em; text-align: center
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
 .lede { font-size: 20px; margin: 0; max-width: 32ch; }
 .menu input:not(.code) { font-size: 18px; }
-.menu > button { font-size: 18px; padding: 14px 36px; }
+.menu > button:not(.link) { font-size: 18px; padding: 14px 36px; }
 .menu { align-self: stretch; max-width: 320px; }
-.menu > input, .menu > button, .submenu, .submenu > button { width: 100%; }
+.menu > input, .menu > button:not(.link), .submenu, .submenu > button { width: 100%; }
 .submenu { gap: 8px; border-left: 2px solid var(--muted); padding-left: 12px; }
 .submenu .row { flex-wrap: nowrap; }
 .submenu .code { min-width: 0; flex: 1; }
-.menu > button:not(.primary) { background: #1c1c1c; box-shadow: inset 0 0 0 1px #000; }
-.menu > button:not(.primary):hover:not(:disabled) { background: #2e2e2e; color: var(--fg); }
+.menu > button:not(.primary):not(.link) { background: #1c1c1c; box-shadow: inset 0 0 0 1px #000; }
+.menu > button:not(.primary):not(.link):hover:not(:disabled) { background: #2e2e2e; color: var(--fg); }
+.menu > .link { align-self: center; }
+.link { background: none; border: 0; padding: 4px 0; color: var(--muted); font-weight: 400; text-decoration: underline; text-underline-offset: 3px; }
+.link:hover:not(:disabled) { background: none; color: var(--fg); }
+.set { gap: 10px; width: 100%; max-width: 320px; cursor: pointer; }
+.set input { width: 18px; height: 18px; padding: 0; accent-color: var(--fg); flex: none; }
+.set .muted { margin-left: auto; }
 .rule { width: 100%; border: 0; border-top: 2px solid #333; margin: 4px 0; }
 footer.muted { font-size: 14px; }
 @media (max-width: 760px) {

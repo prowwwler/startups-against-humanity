@@ -1,10 +1,11 @@
 import { test } from 'node:test'
-import WHAT from './data/cards/what.json' with { type: 'json' }
-import WHOM from './data/cards/whom.json' with { type: 'json' }
 import STRONG from './data/cards/strong.json' with { type: 'json' }
 import GLOSS from './data/cards/gloss.json' with { type: 'json' }
 import assert from 'node:assert/strict'
-import { initial, reduce, botActions, viewFor, pitch, HAND_SIZE, submitters, type State } from './game.ts'
+import { initial, reduce, botActions, viewFor, pitch, HAND_SIZE, submitters, SETS, ALL_SETS, DEFAULT_SETS, pool, type State } from './game.ts'
+
+const WHAT = pool('what', ALL_SETS)
+const WHOM = pool('whom', ALL_SETS)
 
 function seeded(seed = 1) {
   return () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
@@ -114,6 +115,40 @@ test('next: czar advances, host advances when czar is a bot, nobody else', () =>
   assert.equal(reduce(s, { type: 'next', id: 'host' }), s)
   s = reduce(s, { type: 'next', id: 'c' })
   assert.equal(s.round, 4)
+})
+
+test('sets: the SF glossary is off by default', () => {
+  assert.deepEqual(DEFAULT_SETS, ['what:startup', 'whom:victims'])
+  assert.deepEqual(initial().sets, DEFAULT_SETS)
+  const sf = SETS.what.concat(SETS.whom).filter(s => s.id.endsWith(':sf'))
+  assert.equal(sf.length, 2)
+  for (const set of sf) assert.equal(set.name, 'SF glossary')
+})
+
+test('sets: only the chosen subsets are dealt', () => {
+  const only = ['what:sf', 'whom:sf']
+  let s: State = initial()
+  for (const id of ['me', 'b1', 'b2']) s = reduce(s, { type: 'join', id, name: id, bot: id !== 'me' })
+  s = reduce(s, { type: 'start', sets: only })
+  assert.deepEqual(s.sets, only)
+  const sf = new Set(pool('whom', only))
+  for (const p of s.players) for (const c of s.hands[p.id]) assert.ok(sf.has(c), c)
+  assert.ok(pool('what', only).includes(s.what))
+})
+
+test('sets: dropping every subset of a colour falls back to all of it', () => {
+  assert.deepEqual(pool('whom', ['what:sf']), pool('whom', ALL_SETS))
+  assert.deepEqual(pool('what', []), pool('what', ALL_SETS))
+})
+
+test('sets: every subset is named and non-empty', () => {
+  for (const kind of ['what', 'whom'] as const) {
+    assert.ok(SETS[kind].length >= 2)
+    for (const set of SETS[kind]) {
+      assert.ok(set.name.length > 0, set.id)
+      assert.ok(set.cards.length > 0, set.id)
+    }
+  }
 })
 
 test('deck: gloss keys are real cards, strong cards exist, no dupes', () => {

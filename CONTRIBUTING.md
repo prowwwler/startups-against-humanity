@@ -30,10 +30,10 @@ SF tech culture, current. [sf-isms.org](https://sfisms.org) for the dialect, the
 
 ## Card format
 
-- `what.json`: title case, no trailing punctuation. Must read as `[WHAT] for [WHOM]`. `Uber, but` style is fine.
-- `whom.json`: lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
-- No duplicates. Check `node -e 'const w=require("./src/data/cards/whom.json");console.log(new Set(w).size===w.length)'`.
-- `strong.json` entries must exist in `whom.json`.
+- `what/*.json`: title case, no trailing punctuation. Must read as `[WHAT] for [WHOM]`. `Uber, but` style is fine.
+- `whom/*.json`: lowercase noun phrase, no leading "for". `the homeless`, not `For The Homeless`.
+- No duplicates, across subsets too. `npm test` checks this.
+- `strong.json` entries must exist in one of the `whom/` files.
 - `gloss.json`: if the card is slang or an inside reference, add a one-line meaning keyed by the exact card text. Deadpan, under 15 words. Skip it for cards that need no explanation.
 
 ## Code
